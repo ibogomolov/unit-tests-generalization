@@ -2,17 +2,17 @@
 <head>
 
 	<!--  <script type="text/javascript" src="http://yui.yahooapis.com/3.2.0/build/yui/yui-min.js"></script> -->
-	<script type="text/javascript" src="yui/other/yui-min.js"></script>
-	<script type="text/javascript" src="yui/other/functions.js"></script>
-	<script type="text/javascript" src="yui/other/loader-min.js"></script>
-	<link rel="stylesheet" type="text/css" href="yui/other/combo.css" />
+	<script type="text/javascript" src="yui/cached/yui-min.js"></script>
+	<script type="text/javascript" src="yui/cached/functions.js"></script>
+	<script type="text/javascript" src="yui/cached/loader-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="yui/cached/combo.css" />
 	
 	<script type="text/javascript" src="yui/javascript/build/yuitest/yuitest-min.js"></script>
 	<script type="text/javascript" src="yui/javascript/build/yuitest/yuitest-core.js"></script>
 	<script type="text/javascript" src="yui/javascript/build/yuitest/yuitest.js"></script>
 
-	<script type="text/javascript" src="button.js"></script>
-	<script type="text/javascript" src="buttonYui.js"></script>
+	<script type="text/javascript" src="button.js"></script> <!-- script under test -->
+	<script type="text/javascript" src="buttonYui.js"></script> <!-- test cases -->
 
 
 </head>
@@ -20,6 +20,7 @@
 	
 	Input: <input type="text" id="in"> <br>
 	<!-- <button onclick="cl()">script</button> <br> -->
+	<!-- <button onclick="cl()">same script</button> <br> -->
 	<button onclick="dotest()">test</button> <br>
 
 	<div id="div">
@@ -37,14 +38,6 @@
 
 	 	YUI().use('test', function (Y) {
 
-			// create web(!) console
-		    // var r = new Y.Console({
-		    //     newestOnTop : false,
-		    //     style: 'block' // to anchor in the example content
-		    // });
-		    
-		    // r.render('#testLogger');
-		    
 		 	var TestRunner = YUITest.TestRunner;
 		 	if (init) {
 			  	TestRunner.add(testCase);
@@ -58,29 +51,10 @@
 		            messageType = "";
 
 		        switch(event.type){
-		            case TestRunner.BEGIN_EVENT:
-		                message = "Testing began at " + (new Date()).toString() + ".";
-		                messageType = "info";
-		                break;
-		                
-		            case TestRunner.COMPLETE_EVENT:
-		                message = Y.substitute("Testing completed at " +
-		                    (new Date()).toString() + ".\n" +
-		                    "Passed:{passed} Failed:{failed} " +
-		                    "Total:{total} ({ignored} ignored)",
-		                    event.results);
-		                messageType = "info";
-		                break;
 		                
 		            case TestRunner.TEST_FAIL_EVENT:
 		                message = event.testName + ": failed.\n" + event.error.getMessage();
 		                messageType = "fail";
-		                document.getElementById('res').innerHTML += message + "<br>";
-		                break;
-		                
-		            case TestRunner.TEST_IGNORE_EVENT:
-		                message = event.testName + ": ignored.";
-		                messageType = "ignore";
 		                document.getElementById('res').innerHTML += message + "<br>";
 		                break;
 		                
@@ -89,55 +63,19 @@
 		                messageType = "pass";
 		                document.getElementById('res').innerHTML += message + "<br>";
 		                break;
-		                
-		            case TestRunner.TEST_SUITE_BEGIN_EVENT:
-		                message = "Test suite \"" + event.testSuite.name + "\" started.";
-		                messageType = "info";
-		                break;
-		                
-		            case TestRunner.TEST_SUITE_COMPLETE_EVENT:
-		                message = Y.substitute("Test suite \"" +
-		                    event.testSuite.name + "\" completed" + ".\n" +
-		                    "Passed:{passed} Failed:{failed} " +
-		                    "Total:{total} ({ignored} ignored)",
-		                    event.results);
-		                messageType = "info";
-		                break;
-		                
-		            case TestRunner.TEST_CASE_BEGIN_EVENT:
-		                message = "Test case \"" + event.testCase.name + "\" started.";
-		                messageType = "info";
-		                break;
-		                
-		            case TestRunner.TEST_CASE_COMPLETE_EVENT:
-		                message = Y.substitute("Test case \"" +
-		                    event.testCase.name + "\" completed.\n" +
-		                    "Passed:{passed} Failed:{failed} " +
-		                    "Total:{total} ({ignored} ignored)",
-		                    event.results);
-		                messageType = "info";
-		                document.getElementById('res').innerHTML += message + "<br>";
-		                break;
+
 		            default:
 		                message = "Unexpected event " + event.type;
 		                message = "info";
 		        }
 		    
-		        //only log if required
+		        //output to browser console
 		        Y.log(message, messageType, "TestRunner");
 		    }
 		    
 		    if (init) {
-			    // listen for events to publish to the logger
-			    // TestRunner.attach(TestRunner.BEGIN_EVENT, logEvent);
-			    // TestRunner.attach(TestRunner.COMPLETE_EVENT, logEvent);
-			    // TestRunner.attach(TestRunner.TEST_SUITE_BEGIN_EVENT, logEvent);
-			    // TestRunner.attach(TestRunner.TEST_SUITE_COMPLETE_EVENT, logEvent);
-			    TestRunner.subscribe(TestRunner.TEST_CASE_BEGIN_EVENT, logEvent);
-			    TestRunner.subscribe(TestRunner.TEST_CASE_COMPLETE_EVENT, logEvent);
-			    TestRunner.subscribe(TestRunner.TEST_PASS_EVENT, logEvent);
-			    TestRunner.subscribe(TestRunner.TEST_FAIL_EVENT, logEvent);
-			    TestRunner.subscribe(TestRunner.TEST_IGNORE_EVENT, logEvent);
+			    TestRunner.attach(TestRunner.TEST_PASS_EVENT, logEvent);
+			    TestRunner.attach(TestRunner.TEST_FAIL_EVENT, logEvent);
 		    }
 		    
 		    //run the tests
